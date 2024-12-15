@@ -682,6 +682,7 @@ class BuildCmd(ProjectCmdBase):
                     # cmake
                     has_built_marker = False
                     if not (m == manifest and args.cmake_target != "install"):
+                        os.makedirs(os.path.dirname(built_marker), exist_ok=True)
                         with open(built_marker, "w") as f:
                             f.write(project_hash)
                             has_built_marker = True
