@@ -23,12 +23,14 @@ from Cython.Build import cythonize
 from Cython.Compiler import Options
 from setuptools import Extension, setup
 
+additional_libs = []
 if sys.platform == 'darwin' and platform.machine() == 'arm64':
     # Macos (arm64, homebrew path is different than intel)
     library_dirs = ['/opt/homebrew/lib']
 else:
     # Debian/Ubuntu
     library_dirs = ['/usr/lib', '/usr/lib/x86_64-linux-gnu']
+    additional_libs.extend(['unwind'])
     
 # Add (prepend) library paths from CMAKE_PREFIX_PATH
 if cmake_prefix_path := os.environ.get('CMAKE_PREFIX_PATH'):
@@ -56,7 +58,7 @@ exts = [
             'folly/ProactorExecutor.cpp',
             'folly/error.cpp',
         ],
-        libraries=['folly', 'unwind', 'glog', 'double-conversion','fmt'],
+        libraries=['folly', 'glog', 'double-conversion','fmt'] + additional_libs,
         extra_compile_args=['-std=c++20'],  # C++20 for coroutines
         include_dirs=['.', '../..'],  # cython generated code
         library_dirs=library_dirs,
@@ -69,7 +71,7 @@ exts = [
             'folly/iobuf_ext.cpp',
             'folly/error.cpp',
         ],
-        libraries=['folly', 'unwind', 'glog', 'double-conversion', 'fmt'],
+        libraries=['folly', 'glog', 'double-conversion', 'fmt'] + additional_libs,
         extra_compile_args=['-std=c++20'],  # C++20 for coroutines
         include_dirs=['.', '../..'],  # cython generated code
         library_dirs=library_dirs,
@@ -81,8 +83,8 @@ exts = [
             'folly/fibers.cpp',
             'folly/error.cpp',
         ],
-        libraries=['folly', 'unwind', 'boost_coroutine', 'boost_context',
-                   'glog', 'double-conversion', 'fmt', 'event'],
+        libraries=['folly', 'boost_coroutine', 'boost_context',
+                   'glog', 'double-conversion', 'fmt', 'event'] + additional_libs,
         extra_compile_args=['-std=c++20'],  # C++20 for coroutines
         include_dirs=['.', '../..'],  # cython generated code
         library_dirs=library_dirs,
