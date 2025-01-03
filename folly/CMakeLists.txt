@@ -76,8 +76,10 @@ if (PYTHON_EXTENSIONS)
     COMMAND
       python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py
       build_ext -f ${incs} ${libs}
-    BYPRODUCTS ${_cybld}/folly/executor_api.h
-    WORKING_DIRECTORY ${_cybld}
+      BYPRODUCTS ${_cybld}/folly/executor_api.h
+      BYPRODUCTS ${_cybld}/folly/iobuf_api.h
+      BYPRODUCTS ${_cybld}/folly/fiber_manager_api.h
+      WORKING_DIRECTORY ${_cybld}
   )
 
   add_custom_command(TARGET folly_python_bindings POST_BUILD
@@ -93,18 +95,27 @@ if (PYTHON_EXTENSIONS)
     COMPONENT dev
   )
 
-  # Install Folly Python Bindings
-  if (UNIX)
-    set(ROOT_ARG "--root \$DESTDIR/")
-  endif ()
+# Install Folly Python Bindings - vestigial - remove
+# if (UNIX)
+#   set(ROOT_ARG "--root \$DESTDIR/")
+# endif ()
 
-  install(CODE "
-    execute_process(
-      COMMAND
-        python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py install
-        --prefix ${CMAKE_INSTALL_PREFIX} ${ROOT_ARG}
-      COMMAND_ECHO STDOUT
-      WORKING_DIRECTORY ${_cybld}
-    )"
+install(CODE "
+  execute_process(
+    COMMAND
+      python3 ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py install
+      --verbose 
+      --prefix ${CMAKE_INSTALL_PREFIX} 
+      --single-version-externally-managed 
+      --record=installed_files.txt
+    COMMAND_ECHO STDOUT
+    RESULT_VARIABLE result
+    OUTPUT_VARIABLE output
+    ERROR_VARIABLE error
+    WORKING_DIRECTORY ${_cybld}
   )
+  if(result)
+    message(FATAL_ERROR \"Setup.py failed with error code \${result}:\n\${error}\")
+  endif()
+")
 endif ()
