@@ -185,16 +185,18 @@ endif()
 
 list(REMOVE_ITEM files
   ${FOLLY_DIR}/python/error.cpp
-  ${FOLLY_DIR}/python/executor.cpp
+  ${FOLLY_DIR}/python/executor_intf.cpp
   ${FOLLY_DIR}/python/fibers.cpp
   ${FOLLY_DIR}/python/GILAwareManualExecutor.cpp
-  ${FOLLY_DIR}/python/iobuf.cpp
+  ${FOLLY_DIR}/python/iobuf_intf.cpp
   ${FOLLY_DIR}/python/iobuf_ext.cpp
   ${FOLLY_DIR}/python/ProactorExecutor.cpp
 )
 list(REMOVE_ITEM hfiles
   ${FOLLY_DIR}/python/fibers.h
   ${FOLLY_DIR}/python/GILAwareManualExecutor.h
+  ${FOLLY_DIR}/python/executor_intf.h
+  ${FOLLY_DIR}/python/iobuf_intf.h
   ${FOLLY_DIR}/python/iobuf_ext.h
   ${FOLLY_DIR}/python/ProactorExecutor.h
 )
@@ -466,6 +468,12 @@ option(PYTHON_EXTENSIONS
   "Build Python Bindings for Folly, requires Cython and (BUILD_SHARED_LIBS=ON)"
   OFF
 )
+set(PYTHON_PACKAGE_INSTALL_DIR "" CACHE STRING
+  "Installation directory for folly Python packages. \
+  If empty, CMAKE_INSTALL_PREFIX will be used. \
+  No effect if PYTHON_EXTENSIONS=OFF."
+)
+
 
 add_library(folly
   $<TARGET_OBJECTS:folly_base>
